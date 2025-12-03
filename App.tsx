@@ -95,7 +95,11 @@ const App: React.FC = () => {
   };
 
   const onEnded = () => {
-    handleNext();
+    // Loop the song or stop
+    if (audioRef.current) {
+        audioRef.current.currentTime = 0;
+        audioRef.current.play();
+    }
   };
 
   // --- Control Handlers ---
@@ -111,18 +115,6 @@ const App: React.FC = () => {
     }
   };
 
-  const handleNext = () => {
-    const currentIndex = playlist.findIndex(s => s.id === currentSong.id);
-    const nextIndex = (currentIndex + 1) % playlist.length;
-    setCurrentSong(playlist[nextIndex]);
-  };
-
-  const handlePrev = () => {
-    const currentIndex = playlist.findIndex(s => s.id === currentSong.id);
-    const prevIndex = (currentIndex - 1 + playlist.length) % playlist.length;
-    setCurrentSong(playlist[prevIndex]);
-  };
-
   const handleSeek = (time: number) => {
     if (audioRef.current) {
       audioRef.current.currentTime = time;
@@ -133,17 +125,28 @@ const App: React.FC = () => {
   // --- Render ---
 
   return (
-    <div className="relative w-full h-screen overflow-hidden bg-black text-white select-none font-sans">
-      {/* Background Layer - Full Screen Blur */}
+    <div className="relative w-full h-[calc(100dvh)] overflow-hidden bg-black text-white select-none font-sans">
+      {/* Background Layer 1 - Slow Drift */}
       <div 
-        className="absolute inset-0 z-0 transition-all duration-1000 ease-in-out opacity-50 blur-[80px] scale-110" 
+        className="absolute inset-0 z-0 transition-all duration-1000 ease-in-out opacity-60 blur-[80px] animate-subtle-drift" 
         style={{
             backgroundImage: `url(${currentSong.coverUrl})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center',
         }} 
       />
-      <div className="absolute inset-0 z-0 bg-black/60" />
+      
+      {/* Background Layer 2 - Wave Motion (Creates liquid interference) */}
+       <div 
+        className="absolute inset-0 z-0 transition-all duration-1000 ease-in-out opacity-40 blur-[90px] animate-wave mix-blend-overlay" 
+        style={{
+            backgroundImage: `url(${currentSong.coverUrl})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+        }} 
+      />
+
+      <div className="absolute inset-0 z-0 bg-black/30" />
 
       {/* Main Content Layout */}
       <div className="relative z-10 w-full h-full flex flex-col md:flex-row">
@@ -162,7 +165,7 @@ const App: React.FC = () => {
             w-full md:w-[450px]
             bg-zinc-900/90 md:bg-transparent backdrop-blur-2xl md:backdrop-blur-none
             border-t border-white/10 md:border-none
-            transition-all duration-300
+            transition-all duration-300 pb-safe md:pb-0
         ">
             
             {/* 1. Mobile Bottom Bar Layout */}
@@ -186,8 +189,6 @@ const App: React.FC = () => {
                     <Controls 
                         state={playerState} 
                         onPlayPause={handlePlayPause} 
-                        onNext={handleNext} 
-                        onPrev={handlePrev} 
                         isMobile={true}
                     />
                 </div>
@@ -212,8 +213,6 @@ const App: React.FC = () => {
                     <Controls 
                         state={playerState} 
                         onPlayPause={handlePlayPause} 
-                        onNext={handleNext} 
-                        onPrev={handlePrev} 
                     />
                 </div>
             </div>

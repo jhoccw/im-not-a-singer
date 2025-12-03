@@ -39,7 +39,7 @@ const LyricsPanel: React.FC<LyricsPanelProps> = ({ lyricsState, currentTime, onL
   }, [activeLineIndex]);
 
   if (lyricsState.isLoading) {
-    return <div className="h-full flex items-center justify-center text-white/50">Loading lyrics...</div>;
+    return <div className="h-full flex items-center justify-center text-white/50 animate-pulse">Loading lyrics...</div>;
   }
 
   if (lyricsState.error) {
@@ -47,14 +47,13 @@ const LyricsPanel: React.FC<LyricsPanelProps> = ({ lyricsState, currentTime, onL
   }
 
   return (
-    <div className="h-full w-full relative group">
-        {/* Gradient Masks for smooth fade out at top/bottom */}
-        <div className="absolute top-0 left-0 right-0 h-16 md:h-32 bg-gradient-to-b from-black/0 to-transparent z-10 pointer-events-none" />
-        <div className="absolute bottom-0 left-0 right-0 h-16 md:h-32 bg-gradient-to-t from-black/0 to-transparent z-10 pointer-events-none" />
-
+    <div className="h-full w-full relative group animate-fade-in">
+        {/* The lyrics container with CSS Mask for top/bottom fade out */}
         <div 
             ref={containerRef}
-            className="h-full overflow-y-auto no-scrollbar py-[45vh] md:py-[40vh] space-y-8 md:space-y-10 px-4 md:px-4 text-center md:text-left"
+            className="h-full overflow-y-auto no-scrollbar py-[45vh] md:py-[40vh] space-y-8 md:space-y-10 px-4 md:px-4 text-center md:text-left
+            [mask-image:linear-gradient(to_bottom,transparent_0%,black_15%,black_85%,transparent_100%)]
+            [-webkit-mask-image:linear-gradient(to_bottom,transparent_0%,black_15%,black_85%,transparent_100%)]"
             style={{ scrollBehavior: 'smooth' }}
         >
             {lyricsState.lines.map((line, idx) => {
@@ -64,10 +63,10 @@ const LyricsPanel: React.FC<LyricsPanelProps> = ({ lyricsState, currentTime, onL
                     <p 
                         key={idx} 
                         onClick={() => onLineClick(line.time)}
-                        className={`transition-all duration-500 ease-out font-bold leading-tight cursor-pointer origin-center md:origin-left
+                        className={`transition-all duration-700 ease-out font-bold leading-tight cursor-pointer origin-center md:origin-left
                             ${isActive 
-                                ? 'text-3xl md:text-5xl lg:text-6xl text-white opacity-100 scale-100' 
-                                : 'text-xl md:text-3xl lg:text-4xl text-white/30 opacity-40 hover:opacity-100 hover:text-white/60 blur-[0.5px] hover:blur-none'
+                                ? 'text-3xl md:text-5xl lg:text-6xl text-white opacity-100 scale-100 blur-0' 
+                                : 'text-xl md:text-3xl lg:text-4xl text-white/40 opacity-30 scale-95 blur-[1.5px] hover:opacity-80 hover:blur-0 hover:scale-100'
                             }
                         `}
                     >
